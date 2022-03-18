@@ -2,8 +2,8 @@
 mod colorprint;
 use pnet::datalink::Channel::Ethernet;
 use pnet::datalink::{self, NetworkInterface};
-use pnet::packet::ethernet::{EthernetPacket, MutableEthernetPacket};
-use pnet::packet::{MutablePacket, Packet};
+use pnet::packet::ethernet::EthernetPacket;
+use pnet::packet::Packet;
 use std::process::exit;
 
 macro_rules! error_and_exit_app {

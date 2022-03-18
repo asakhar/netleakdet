@@ -2,8 +2,8 @@
 mod colorprint;
 use pnet::datalink::Channel::Ethernet;
 use pnet::datalink::{self, NetworkInterface};
-use pnet::packet::ethernet::{EthernetPacket, MutableEthernetPacket};
-use pnet::packet::{MutablePacket, Packet};
+use pnet::packet::ethernet::{EthernetPacket};
+use pnet::packet::{Packet};
 use std::process::exit;
 
 macro_rules! error_and_exit_app {
@@ -46,19 +46,6 @@ fn extract_utf(data: &[u8]) -> String {
   }
   extracted
 }
-// fn not_spec(c: &char) -> char {
-//   if ('a' <= *c && *c <= 'z') || ('A' <= *c && *c <= 'Z' || ("<>{}[]()'\"".as_bytes().contains(c)))
-//   {
-//     return *c;
-//   }
-//   '.'
-// }
-
-// fn rem_spec(string: &str) -> String {
-//   let chars = string.chars().collect::<Vec<char>>();
-//   let iter = chars.iter().map(not_spec);
-//   String::from_iter(iter)
-// }
 
 fn main() {
   let args: Vec<String> = std::env::args().collect();
@@ -70,14 +57,14 @@ fn main() {
     None => usage(),
     Some(res) => res.clone(),
   };
-  let file : Vec<String> = match std::fs::read_to_string(words_base_fn) {
+  let file = match std::fs::read_to_string(words_base_fn) {
     Err(why) => {
       redln!("Invalid filename for words base provided: {}", why);
       usage();
     }
     Ok(res) => res,
-  }
-  .split("\n").collect();
+  };
+  let words: Vec<&str> = file.split("\n").collect();
 
   let interface_names_match = |iface: &NetworkInterface| iface.name == interface_name;
 
@@ -109,15 +96,15 @@ fn main() {
         } else {
           "received"
         };
-        for word in file.iter() {
+        for word in words.iter() {
           if packet_data.contains(word) {
             redln!("Potentially malicious packet {}: {}", txrx, packet_data);
           }
         }
       }
-      Err(e) => {
+      Err(why) => {
         // If an error occurs, we can handle it here
-        panic!("An error occurred while reading: {}", e);
+        redln!("An error occurred while reading: {}", why);
       }
     }
   }
